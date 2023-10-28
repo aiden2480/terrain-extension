@@ -1,0 +1,16 @@
+{
+    "name": "Scouts Terrain Approvals",
+    "description": "Easily view pending approvals",
+    "version": "0.0.1",
+    "manifest_version": 3,
+    "permissions": ["storage"],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "icons": {
+        "128": "static/icons/128.png"
+    }
+}
