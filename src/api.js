@@ -26,7 +26,8 @@ export async function loginWithUsernameAndPassword(username, password) {
     if (resp.ok) {
         await chrome.storage.sync.set({
             RefreshToken: data.AuthenticationResult.RefreshToken,
-            AccessToken: data.AuthenticationResult.AccessToken
+            AccessToken: data.AuthenticationResult.AccessToken,
+            AccessTokenExpiresAt: new Date().getTime() + 1000 * data.AuthenticationResult.ExpiresIn
         });
     } else {
         res.message = data.__type + " - " + data.message;
