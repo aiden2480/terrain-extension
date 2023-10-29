@@ -146,3 +146,12 @@ export async function fetchUnitList() {
         return groupObj.unit;
     }).filter(x => x != null);
 }
+
+export async function fetchPendingApprovals(unitID) {
+    var resp = await fetch(`https://achievements.terrain.scouts.com.au/units/${unitID}/submissions?status=pending`, {
+        headers: { "Authorization": await getIdToken() }
+    });
+
+    var data = await resp.json();
+    console.log(data);
+}
