@@ -29,7 +29,7 @@ export async function loginWithUsernameAndPassword(username, password) {
             AccessToken: data.AuthenticationResult.AccessToken
         });
     } else {
-        res.message = data.__type + ": " + data.message;
+        res.message = data.__type + " - " + data.message;
     }
 
     return res;
@@ -45,16 +45,25 @@ export async function userIsLoggedIn() {
     return RefreshToken != null;
 }
 
-async function ensureValidAccessToken() {
-    var { AccessTokenExpiresAt } = await chrome.storage.sync.get([ "AccessTokenExpiresAt" ]);
-    
-    if (new Date().getTime() >= AccessTokenExpiresAt) {
-        await generateNewAccessToken();
+async function getAccessToken() {
+    var {
+        AccessToken,
+        AccessTokenExpiresAt
+    } = await chrome.storage.sync.get([ "AccessToken", "AccessTokenExpiresAt" ]);
+
+    if ([AccessToken, AccessTokenExpiresAt].includes(undefined) || new Date().getTime() >= AccessTokenExpiresAt) {
+        AccessToken = await generateNewAccessToken();
     }
+
+    return AccessToken;
 }
 
 async function generateNewAccessToken() {
     var { RefreshToken } = await chrome.storage.sync.get([ "RefreshToken" ]);
+
+    if (RefreshToken == null) {
+        throw new Error("RefreshToken not set, please login with username and password first");
+    }
 
     var body = {
         "ClientId": "6v98tbc09aqfvh52fml3usas3c",
@@ -72,16 +81,23 @@ async function generateNewAccessToken() {
     });
 
     var data = await resp.json();
+    
+    if (!resp.ok) {
+        await logout();
+        throw new Error(data.__type + " - " + data.message);
+    }
+
     await chrome.storage.sync.set({
         AccessToken: data.AuthenticationResult.AccessToken,
         AccessTokenExpiresAt: new Date().getTime() + 1000 * data.AuthenticationResult.ExpiresIn
     });
+
+    return data.AuthenticationResult.AccessToken;
 }
 
 export async function fetchUserData() {
-    await ensureValidAccessToken();
     var body = {
-        "AccessToken": (await chrome.storage.sync.get()).AccessToken,
+        "AccessToken": await getAccessToken(),
     }
 
     var headers = {
