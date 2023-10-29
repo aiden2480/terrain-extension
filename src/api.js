@@ -26,6 +26,7 @@ export async function loginWithUsernameAndPassword(username, password) {
     if (resp.ok) {
         await chrome.storage.sync.set({
             RefreshToken: data.AuthenticationResult.RefreshToken,
+            IdToken: data.AuthenticationResult.IdToken,
             AccessToken: data.AuthenticationResult.AccessToken,
             AccessTokenExpiresAt: new Date().getTime() + 1000 * data.AuthenticationResult.ExpiresIn
         });
@@ -37,7 +38,7 @@ export async function loginWithUsernameAndPassword(username, password) {
 }
 
 export async function logout() {
-    await chrome.storage.sync.remove([ "RefreshToken", "AccessToken", "AccessTokenExpiresAt" ]);
+    await chrome.storage.sync.clear();
 }
 
 export async function userIsLoggedIn() {
@@ -46,20 +47,34 @@ export async function userIsLoggedIn() {
     return RefreshToken != null;
 }
 
-async function getAccessToken() {
+async function getTokens() {
     var {
+        IdToken,
         AccessToken,
         AccessTokenExpiresAt
-    } = await chrome.storage.sync.get([ "AccessToken", "AccessTokenExpiresAt" ]);
-
-    if ([AccessToken, AccessTokenExpiresAt].includes(undefined) || new Date().getTime() >= AccessTokenExpiresAt) {
-        AccessToken = await generateNewAccessToken();
+    } = await chrome.storage.sync.get([ "IdToken", "AccessToken", "AccessTokenExpiresAt" ]);
+    
+    var tokens = { IdToken, AccessToken };
+    if ([IdToken, AccessToken, AccessTokenExpiresAt].includes(undefined) || new Date().getTime() >= AccessTokenExpiresAt) {
+        tokens = await generateNewTokens();
     }
 
+    return tokens;
+}
+
+async function getAccessToken() {
+    var { AccessToken } = await getTokens();
+    
     return AccessToken;
 }
 
-async function generateNewAccessToken() {
+async function getIdToken() {
+    var { IdToken } = await getTokens();
+
+    return IdToken;
+}
+
+async function generateNewTokens() {
     var { RefreshToken } = await chrome.storage.sync.get([ "RefreshToken" ]);
 
     if (RefreshToken == null) {
@@ -89,11 +104,15 @@ async function generateNewAccessToken() {
     }
 
     await chrome.storage.sync.set({
+        IdToken: data.AuthenticationResult.IdToken,
         AccessToken: data.AuthenticationResult.AccessToken,
         AccessTokenExpiresAt: new Date().getTime() + 1000 * data.AuthenticationResult.ExpiresIn
     });
 
-    return data.AuthenticationResult.AccessToken;
+    return {
+        IdToken: data.AuthenticationResult.IdToken,
+        AccessToken: data.AuthenticationResult.AccessToken
+    }
 }
 
 export async function fetchUserData() {
