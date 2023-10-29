@@ -134,3 +134,15 @@ export async function fetchUserData() {
     var data = await resp.json();
     return "Hello, " + data.UserAttributes[2].Value;
 }
+
+export async function fetchUnitList() {
+    var resp = await fetch("https://members.terrain.scouts.com.au/profiles", {
+        headers: { "Authorization": await getIdToken() }
+    });
+    
+    var data = await resp.json();
+    
+    return data.profiles.map(groupObj => {
+        return groupObj.unit;
+    }).filter(x => x != null);
+}

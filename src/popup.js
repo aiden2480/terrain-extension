@@ -7,7 +7,14 @@ async function main() {
         if (!success) alert(message);
     }
 
-    document.write(await api.fetchUserData());
+    document.querySelector("#user-email").textContent = await api.fetchUserData();
+
+    var units = await api.fetchUnitList();
+    var unitSelect = document.querySelector("#unit-select");
+
+    units.forEach(unit => {
+        unitSelect.appendChild(new Option(unit.name, unit.id));
+    });
 }
 
 window.api = api;
