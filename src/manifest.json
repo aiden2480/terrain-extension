@@ -8,9 +8,9 @@
         "default_popup": "popup.html"
     },
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "js/background.js"
     },
     "icons": {
-        "128": "static/icons/128.png"
+        "128": "images/128.png"
     }
 }

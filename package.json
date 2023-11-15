@@ -1,0 +1,21 @@
+{
+  "name": "terrain-extension",
+  "author": "aiden2480",
+  "license": "ISC",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.mix.js",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --env=production --config=node_modules/laravel-mix/setup/webpack.config.js"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "laravel-mix": "^6.0.49",
+    "postcss": "^8.4.23",
+    "sass": "^1.62.1",
+    "sass-loader": "^13.2.2",
+    "vue": "^3.3.1",
+    "vue-loader": "^17.1.1",
+    "vue-template-compiler": "^2.7.14"
+  }
+}

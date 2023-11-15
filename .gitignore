@@ -1,2 +1,8 @@
+# Editor files
 .vscode/
 .vs/
+
+# Node
+node_modules/
+dist/
+mix-manifest.json

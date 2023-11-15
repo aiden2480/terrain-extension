@@ -152,6 +152,5 @@ export async function fetchPendingApprovals(unitID) {
         headers: { "Authorization": await getIdToken() }
     });
 
-    var data = await resp.json();
-    console.log(data);
+    return await resp.json();
 }
