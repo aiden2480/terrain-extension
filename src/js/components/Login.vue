@@ -1,5 +1,6 @@
 <template>
-    <div class="container" v-if="!isLoggedIn">
+    <Popup v-if="isLoggedIn == true"></Popup>
+    <div v-else-if="isLoggedIn == false" class="container">
         <select id="branch">
             <option value="act">Australian Capital Territory</option>
             <option value="nsw">New South Wales</option>
@@ -17,7 +18,6 @@
 
         <Button :onClick="submit">Submit</Button>
     </div>
-    <Popup v-else></Popup>
 </template>
 
 <script>
@@ -47,7 +47,7 @@ export default {
         }
     },
     data() {
-        return { isLoggedIn : false }
+        return { isLoggedIn : null }
     },
     created: async function() {
         this.isLoggedIn = await api.userIsLoggedIn();
